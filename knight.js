@@ -1,16 +1,54 @@
-let n = 5;
+let n = 6;
 let cellSize = 75;
 let res;
+let positions = [];
+let currentStep = 0;
 
 function setup() {
   createCanvas(n * cellSize, n * cellSize);
   res = knightTour(n);
-  noLoop(); // Prevent draw from looping
+  computePositions(res);
+  frameRate(10); // adjust speed here
 }
 
 function draw() {
-  background(220);
-  drawBoard(res);
+  background(255);
+  drawPathUpTo(currentStep);
+  
+  currentStep++;
+  if (currentStep >= positions.length) {
+    noLoop(); // Stop animation when done
+  }
+}
+
+function computePositions(board) {
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      let step = board[i][j];
+      if (step !== -1) {
+        positions[step] = {
+          x: j * cellSize + cellSize / 2,
+          y: i * cellSize + cellSize / 2
+        };
+      }
+    }
+  }
+}
+
+
+function drawPathUpTo(step) {
+  stroke(255, 0, 0);
+  strokeWeight(3);
+  noFill();
+
+  for (let i = 0; i < step; i++) {
+    let a = positions[i];
+    let b = positions[i + 1];
+    if (a && b) {
+      line(a.x, a.y, b.x, b.y);
+    }
+  }
+
 }
 
 function isSafe(x, y, n, board) {
@@ -53,31 +91,4 @@ function knightTour(n) {
   }
 
   return [[-1]];
-}
-
-function drawBoard(board) {
-  let positions = [];
-
-  // Collect the positions for each step
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      let step = board[i][j];
-      if (step !== -1) {
-        positions[step] = {
-          x: j * cellSize + cellSize / 2,
-          y: i * cellSize + cellSize / 2
-        };
-      }
-    }
-  }
-
-  // Draw knight path
-  stroke(255, 0, 0);
-  strokeWeight(3);
-  for (let i = 0; i < positions.length - 1; i++) {
-    let a = positions[i];
-    let b = positions[i + 1];
-    line(a.x, a.y, b.x, b.y);
-  }
-
 }
